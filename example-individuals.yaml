@@ -1,0 +1,217 @@
+openapi: 3.0.3
+servers:
+  - url: https://development.my-service.island.is
+    description: Development server
+  - url: https://staging.my-service.island.is
+    description: Staging server
+  - url: https://production.my-service.island.is
+    description: Production server
+info:
+  description: |-
+    Provides access to an example service that retrieves individuals
+  version: 1.0.1
+  title: National Registry - Demo
+  termsOfService: ""
+  contact:
+    name: Stafrænt Ísland
+    url: https://stafraent.island.is/
+    email: stafraentisland@fjr.is
+  license:
+    name: MIT
+    url: "https://opensource.org/licenses/MIT"
+  x-pricing:
+    - free
+  x-category:
+    - personal
+    - official
+  x-links:
+    documentation: "https://docs.my-service.island.is"
+    responsibleParty: "https://my-service.island.is/responsible"
+    bugReport: "https://github.com/saevarma/island-is-oas-examples/issues/new?assignees=&labels=&template=bug_report.md"
+    featureRequest: "https://github.com/saevarma/island-is-oas-examples/issues/new?assignees=&labels=&template=feature_request.md"
+paths:
+  /individuals:
+    get:
+      description: |
+        Returns all individuals registered
+      operationId: getIndividuals
+      parameters:
+        - name: dateOfBirth
+          in: query
+          description: Find all individuals born after set date
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: |
+            Returns an array of individuals, either it returns all individuals or individuals born after a specific date
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  individuals:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Individual"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    $ref: "#/components/schemas/Error"
+  /individuals/{id}:
+    get:
+      description: |
+        Returns individual based on a single ID
+      operationId: getIndividual
+      parameters:
+        - name: id
+          in: path
+          description: UUID of an individual
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        "200":
+          description: |
+            Returns an individual with a specific id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  individuals:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Individual"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/BadRequest"
+components:
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                $ref: "#/components/schemas/Error"
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                $ref: "#/components/schemas/Error"
+    InternalServerError:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                $ref: "#/components/schemas/Error"
+  schemas:
+    Individual:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique UUID
+          format: UUID
+        nationalId:
+          type: string
+          minLength: 12
+          maxLength: 12
+          pattern: '^\d{12}$'
+          description: National security number
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 250
+          description: First name and middle name
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 250
+          description: Last name
+        dateOfBirth:
+          type: string
+          format: date-time
+          description: UTC date of birth
+      example:
+        id: "BA84DAF1-DE55-40A8-BF35-8A76C7F936F6"
+        nationalId: "160108117573"
+        firstName: "Quyn G."
+        lastName: "Rice"
+        dateOfBirth: "2019-03-29T18:00:58.000Z"
+        address: "377-8970 Vitae Rd."
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ErrorDetail"
+      example:
+        code: 400
+        message: "Bad request"
+        errors:
+          - code: 87
+            message: "Parameter is incorrectly formatted"
+            help: "https://www.example.is/awesome/documetation/devices"
+            trackingId: "5d17a8ada52a2327f02c6a1a"
+            param: "deviceId"
+          - code: 85
+            message: Parameter missing
+            help: "https://www.example.is/awesome/documetation/devices"
+    ErrorDetail:
+      type: object
+      required:
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        help:
+          type: string
+        trackingId:
+          type: string
+        param:
+          type: string
