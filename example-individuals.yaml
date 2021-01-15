@@ -8,7 +8,7 @@ servers:
     description: Production server
 info:
   description: |-
-    Provides access to an example service that retrieves individuals
+    Provides access to an example service that retrieves individuals.
   version: 1.0.1
   title: National Registry - Demo
   termsOfService: ""
@@ -24,6 +24,10 @@ info:
   x-category:
     - personal
     - official
+    - open
+    - health
+    - public
+    - financial
   x-links:
     documentation: "https://docs.my-service.island.is"
     responsibleParty: "https://my-service.island.is/responsible"
