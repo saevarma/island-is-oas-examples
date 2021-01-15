@@ -10,7 +10,7 @@ info:
   description: |-
     Provides access to an example service that retrieves individuals.
   version: 1.0.1
-  title: National Registry - Demo
+  title: Simple API Overview
   termsOfService: ""
   contact:
     name: Stafrænt Ísland
